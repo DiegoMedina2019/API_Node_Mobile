@@ -23,15 +23,15 @@ https.createServer({
 
 
 
-/* app.get("/",(req,res) => {
+ app.get("/",(req,res) => {
     res.send("Ruta Inicio");
 })
 
 // se le puede asignar por consola set PUERTO=7000 por ejemplo pero si no esta asignado usara el 3000
-const puerto = process.env.PUERTO || 3000; 
+/* const puerto = process.env.PUERTO || 3000; 
 app.listen(puerto,() => {
     console.log("Seervidor OK en puerto: "+puerto)
-}) */
+})  */
 
 
 

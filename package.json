@@ -4,7 +4,8 @@
   "description": "servicio de App AsproBank, donde se conectara a Mysql",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "pm2":"pm2 start app.js"
   },
   "author": "Diego Medina",
   "license": "ISC",

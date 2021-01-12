@@ -11,9 +11,9 @@ const mysql = require("mysql");
 //CONEXION A localhost
 const conexion = mysql.createConnection({
     host: 'localhost',
-    database:'asprobank',
+    database:'falsoservicio',
     user:'root',
-    password:''
+    password:'lhe2604'
 })
 
 conexion.connect(
