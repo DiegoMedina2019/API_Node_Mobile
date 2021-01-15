@@ -9,25 +9,25 @@ afiliadoRouter.get("/afiliados",(req,res) => {
     })
 })
 //TRAE SOLO UN AFILIADO
-afiliadoRouter.get("/afiliados/:id",(req,res) => {
+afiliadoRouter.get("/afiliado/:id",(req,res) => {
     controlador.GetAfiliado( req ,(respuesta) => {
         res.send(respuesta)
     })
 })
 //CREAR UN AFILIADO
-afiliadoRouter.post("/afiliados",(req,res) => {
+afiliadoRouter.post("/afiliado",(req,res) => {
     controlador.AddAfiliado( req ,(respuesta) => {
         res.send(respuesta)
     })
 })
 //EDITAR UN AFILIADO
-afiliadoRouter.put("/afiliados/:id",(req,res) => {
+afiliadoRouter.put("/afiliado/:id",(req,res) => {
     controlador.UpdateAfiliado( req ,(respuesta) => {
         res.send(respuesta)
     })
 })
 //ELIMINAR UN AFILIADO
-afiliadoRouter.delete("/afiliados/:id",(req,res) => {
+afiliadoRouter.delete("/afiliado/:id",(req,res) => {
     controlador.ElimiarAfiliado( req ,(respuesta) => {
         res.send(respuesta)
     })

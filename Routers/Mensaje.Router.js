@@ -9,7 +9,7 @@ mensajeRouter.get("/mensajes/:id",(req,res) => {
     })
 })
 //TRAE SOLO UN mensaje
-mensajeRouter.get("/mensajes/:id",(req,res) => {
+mensajeRouter.get("/mensaje/:id",(req,res) => {
     controlador.GetMensaje( req ,(respuesta) => {
         res.send(respuesta)
     })

@@ -8,12 +8,18 @@ const mysql = require("mysql");
     password:'asprob2604'
 }) */
 
-//CONEXION A localhost
-const conexion = mysql.createConnection({
+//CONEXION A localhost---falso servicio o DB produccion
+/* const conexion = mysql.createConnection({
     host: 'localhost',
     database:'falsoservicio',
     user:'root',
     password:'lhe2604'
+}) */
+const conexion = mysql.createConnection({
+    host: 'localhost',
+    database:'asprobank',
+    user:'asprob',
+    password:'asprob2604'
 })
 
 conexion.connect(
