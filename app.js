@@ -20,12 +20,28 @@ https.createServer({
 
 
 
+app.use(express.static(__dirname + '/public'))
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
-
-
- app.get("/",(req,res) => {
+app.get("/",(req,res) => {
     res.send("Ruta Inicio");
 })
+
+app.get("/recibo/:url",(req,res) => {
+
+  console.log(req.params)
+  //var file = __dirname + '/public/documentos/recibos/recibo1_ejemplo_afi1.png'// +req.params.url;
+  var file = __dirname + '/public/documentos/recibos/' +req.params.url;
+   res.download(file);
+
+/*   fs.readFile('public/documentos/recibos/recibo1_ejemplo_afi1.png',(err, data) => {
+    if (err) throw err;
+    res.send(data);
+  }); */
+
+})
+
 
 // se le puede asignar por consola set PUERTO=7000 por ejemplo pero si no esta asignado usara el 3000
 /* const puerto = process.env.PUERTO || 3000; 
