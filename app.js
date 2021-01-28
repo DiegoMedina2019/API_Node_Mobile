@@ -30,16 +30,22 @@ app.get("/",(req,res) => {
 
 app.get("/recibo/:url",(req,res) => {
 
-  console.log(req.params)
-  //var file = __dirname + '/public/documentos/recibos/recibo1_ejemplo_afi1.png'// +req.params.url;
-  var file = __dirname + '/public/documentos/recibos/' +req.params.url;
-   res.download(file);
+  let ruta = "public/documentos/recibos/"+req.params.url;
+  res.redirect('/descargas.html?ruta='+ruta)
 
-/*   fs.readFile('public/documentos/recibos/recibo1_ejemplo_afi1.png',(err, data) => {
-    if (err) throw err;
-    res.send(data);
-  }); */
+})
 
+app.get("/reyes/:url",(req,res) => {
+
+  let ruta = "public/documentos/reyes_magos/"+req.params.url;
+  res.redirect('/descargas.html?ruta='+ruta)
+
+})
+
+app.post("/descargas", (req,res) =>{
+  //var file = __dirname + '/public/documentos/reyes_magos/' +req.params.url;
+  let file = __dirname + '/'+req.body.url;
+   res.download(file);  //reyes2_afi1.jpg
 })
 
 
@@ -52,7 +58,8 @@ app.listen(puerto,() => {
 
 
 const afiliadoRouter = require("./Routers/Afiliado.Router")
-const mensajeRouter = require("./Routers/Mensaje.Router")
+const mensajeRouter = require("./Routers/Mensaje.Router");
+const { send } = require("process");
 
 app.use("/api/",afiliadoRouter)
 app.use("/api/",mensajeRouter)
