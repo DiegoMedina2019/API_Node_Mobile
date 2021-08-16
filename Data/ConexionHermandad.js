@@ -9,18 +9,18 @@ const mysql = require("mysql");
 }) */
 
 //CONEXION A localhost---falso servicio o DB produccion
-const conexionHermandad = mysql.createConnection({
+/* const conexionHermandad = mysql.createConnection({
     host: 'localhost',
     database:'servicio_hermandad',
     user:'root',
     password:'lhe2604'
-})
-/* const conexionHermandad = mysql.createConnection({
+}) */
+const conexionHermandad = mysql.createConnection({
     host: 'localhost',
     database:'hermandad',
     user:'root',
     password:''
-}) */
+})
 
 conexionHermandad.connect(
     (error) => {

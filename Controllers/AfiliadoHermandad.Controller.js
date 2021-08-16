@@ -152,7 +152,7 @@ exports.CargarSepa = (req,callback) => {
 
     let data = {
         nombre:req.body.nombre,
-        url:req.body.url,
+        url:req.body.ruta,
         Afiliados_idAfiliados:req.body.idafiliado,
         TipoDocumento_idTipoDocumento:2
     }

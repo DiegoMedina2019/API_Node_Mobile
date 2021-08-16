@@ -3,6 +3,8 @@ const afiliadoRouter = express.Router();
 const controlador = require("../Controllers/Afiliado.Controller");
 const controlHermandad = require("../Controllers/AfiliadoHermandad.Controller");
 
+const multer = require("multer");
+
 //TRAE TODOS LOS AFILIADOS
 afiliadoRouter.get("/afiliados",(req,res) => {
     if (req.body.db === 'hermandad') {
@@ -126,11 +128,31 @@ afiliadoRouter.get("/reyes_magos/:id",(req,res) => {
     })
 })
 
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "public/documentos/sepa");
+    },
+    filename: (req, file, cb) => {
+        console.log(file);
+        cb(null, file.fieldname+ '-' + Date.now());
+    }
+});
+
+const upload = multer({ storage: storage });
+
 //SUBIR DOC SEPAS
-afiliadoRouter.post("/sepa",(req,res) => {
-    controlHermandad.CargarSepa( req ,(respuesta) => {
+afiliadoRouter.post("/sepa",upload.single('image'),(req,res) => {
+/*     controlHermandad.CargarSepa( req ,(respuesta) => {
         res.send(respuesta)
-    })
+    }) */
+    console.log(req.file);
+    try {
+        return res.status(201).json({
+            message: 'File uploded successfully'
+        });
+    } catch (error) {
+        console.error(error);
+    }
 })
 
 module.exports = afiliadoRouter;
