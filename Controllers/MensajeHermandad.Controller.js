@@ -3,7 +3,7 @@ const moment = require("moment-timezone");
 moment().tz("Europe/Madrid").format();
 
 exports.GetMensajes = (req,callback) => {
-    let query  = "SELECT * FROM mensajes WHERE Afiliados_idAfiliados = ?";
+    let query  = "SELECT * FROM mensajes WHERE idafiliado = ?";
     conexion.query(query,req.params.id, (error,filas) => {
         if(error){
             callback(error)
@@ -15,7 +15,7 @@ exports.GetMensajes = (req,callback) => {
 
 
 exports.GetMensaje = (req,callback) => {
-    let query  = "SELECT * FROM mensajes WHERE idMensajes = ?";
+    let query  = "SELECT * FROM mensajes WHERE idmensaje = ?";
     conexion.query(query,[req.params.id], (error,fila) => {
         if(error){
             callback(error)
@@ -30,9 +30,9 @@ exports.GetMensaje = (req,callback) => {
 exports.AddMensaje = (req,callback) => {
     let data = {
         emisor:req.body.emisor,
-        mensaje:req.body.mensaje,
+        Mensaje:req.body.mensaje,
         Fecha: new Date(),
-        Afiliados_idAfiliados:req.body.idafiliado,
+        idafiliado:req.body.idafiliado,
     }
     let sql = "INSERT INTO mensajes SET ?";
     conexion.query(sql,data,(error,resultado) => {
@@ -43,10 +43,11 @@ exports.AddMensaje = (req,callback) => {
 exports.UpdateMensaje = (req,callback) => {
    // console.log(req.body);
     let data = [
-        req.body.visto.split('Z')[0],
+        req.body.FechaVisto.split('Z')[0],
+        req.body.idModificacion.split('Z')[0],
         req.params.id,
     ] //el orden en el arr sera el orden en el q encajen en el set del update
-    let sql = "UPDATE mensajes SET visto = ? WHERE idMensajes= ?";
+    let sql = "UPDATE mensajes SET FechaVisto = ?, idModificacion = ? WHERE idmensaje= ?";
   //  console.log(data);
     conexion.query(sql,data,(error,resultado) => {
         if(error) callback(error);
@@ -54,7 +55,7 @@ exports.UpdateMensaje = (req,callback) => {
     })
 }
 exports.ElimiarMensaje = (req,callback) => {
-    conexion.query("DELETE FROM mensajes WHERE idMensajes = ?",[req.params.id],(error,resultado) => {
+    conexion.query("DELETE FROM mensajes WHERE idmensaje = ?",[req.params.id],(error,resultado) => {
         if(error) callback(error);
         callback(resultado);
     })

@@ -1,12 +1,12 @@
 const mysql = require("mysql");
 
 //CONEXION A ASPROBANK
- var conexion = mysql.createConnection({
+/*  var conexion = mysql.createConnection({
     host: '82.159.210.91',
     database:'asprobank',
     user:'asprob',
     password:'asprob2604'
-}) 
+})  */
 
 //CONEXION A localhost---falso servicio o DB produccion
 /* const conexion = mysql.createConnection({
@@ -15,12 +15,12 @@ const mysql = require("mysql");
     user:'root',
     password:'lhe2604'
 }) */
-/* const conexion = mysql.createConnection({
+const conexion = mysql.createConnection({
     host: 'localhost',
     database:'asprobank',
-    user:'asprob',
-    password:'asprob2604'
-}) */
+    user:'root',
+    password:''
+})
 
 conexion.connect(
     (error) => {

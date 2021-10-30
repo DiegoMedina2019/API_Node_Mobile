@@ -4,6 +4,7 @@ const controlador = require("../Controllers/Afiliado.Controller");
 const controlHermandad = require("../Controllers/AfiliadoHermandad.Controller");
 
 const multer = require("multer");
+const mimetype = require('mime-types');
 
 //TRAE TODOS LOS AFILIADOS
 afiliadoRouter.get("/afiliados",(req,res) => {
@@ -29,6 +30,14 @@ afiliadoRouter.get("/afiliado/:id",(req,res) => {
         })
     }
 })
+
+//TRAE LOS FAMILIARES DE UN AFILIADO
+afiliadoRouter.get("/familiares/:idafiliado",(req,res) => {
+    controlHermandad.GetFamilia( req ,(respuesta) => {
+        res.send(respuesta)
+    })
+})
+
 afiliadoRouter.get("/afiliadoAux/:id",(req,res) => { //esta ruta define si el afiliado podra editar sus datos
     controlHermandad.GetAfiliadoAux( req ,(respuesta) => {
         if (respuesta.length == 0 || respuesta[0].editado == 0) {
@@ -59,7 +68,7 @@ afiliadoRouter.post("/afiliadoAux",(req,res) => {
 //EDITAR UN AFILIADO
 afiliadoRouter.put("/afiliado/:id",(req,res) => {
     if (req.body.db === 'hermandad') {
-        controlHermandad.UpdateAfiliadoAux( req ,(respuesta) => {
+        controlHermandad.UpdateDataAfiliado( req ,(respuesta) => {
             res.send(respuesta)
         })
     } else {//ira a asprobak  
@@ -67,6 +76,12 @@ afiliadoRouter.put("/afiliado/:id",(req,res) => {
             res.send(respuesta)
         })
     }
+})
+//EDITAR DATOS DE FAMILIAR DE UN AFILIADO
+afiliadoRouter.put("/afiliado/familia_Update/:idfamilia",(req,res) => {
+    controlHermandad.UpdateDataFamiliar( req ,(respuesta) => {
+        res.send(respuesta)
+    })
 })
 //SET LA NUEVA PASSWOR DEL AFILIADO QUE SE REGISTRA
 afiliadoRouter.put("/set_pass_afiliado_hermandad/:id",(req,res) => {
@@ -88,6 +103,10 @@ afiliadoRouter.delete("/afiliado/:id",(req,res) => {
 })
 
 //LOGIN AFILIADO
+/* para agregar el campo password en la DB hermandad
+ALTER TABLE `hermandad`.`afiliados` 
+ADD COLUMN `password` VARCHAR(50) NULL DEFAULT NULL AFTER `CuotaAntes`;
+*/
 afiliadoRouter.post("/login",(req,res) => {
     if (req.body.db === 'hermandad') {
         controlHermandad.LoginAfiliado( req ,(respuesta) => {
@@ -134,7 +153,7 @@ const storage = multer.diskStorage({
     },
     filename: (req, file, cb) => {
         console.log(file);
-        cb(null, file.fieldname+ '-' + Date.now());
+        cb(null, file.fieldname+ '-' + Date.now() +'.'+ mimetype.extension(file.mimetype) );
     }
 });
 

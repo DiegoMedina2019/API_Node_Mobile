@@ -10,12 +10,31 @@ exports.GetAfiliados = (req,callback) => {
     })
 }
 exports.GetAfiliado = (req,callback) => {
-    conexion.query("SELECT * FROM afiliados WHERE idAfiliados = ?",[req.params.id], (error,fila) => {
+    conexion.query("SELECT * FROM afiliados WHERE idafiliado = ?",[req.params.id], (error,fila) => {
         if(error){
             callback(error)
         }else{
            // callback(fila);
            callback(fila[0].email);
+        }
+    })
+}
+//para obtener todos los familiares de un afiliado
+exports.GetFamilia = (req,callback) => {
+    let sql = "SELECT \
+                idafiliadodetalle,\
+                razonsocial as apellido,\
+                nombre, \
+                nif, \
+                parentesco, \
+                fechanacimiento \
+               FROM afiliadosdetalle WHERE idafiliado = ?";
+
+    conexion.query(sql,[req.params.idafiliado], (error,filas) => {
+        if(error){
+            callback(error)
+        }else{
+           callback(filas);
         }
     })
 }
@@ -39,7 +58,7 @@ exports.AddAfiliado = (req,callback) => {
         telefono:req.body.telefono,
         password:req.body.password
     }
-    let sql = "INSERT INTO afiliados SET ?";
+    let sql = "INSERT INTO idafiliado SET ?";
     conexion.query(sql,data,(error,resultado) => {
         if(error) callback(error);
         callback(resultado);
@@ -59,32 +78,95 @@ exports.AddAfiliadoAux = (req,callback) => { //falso update
         callback(resultado);
     })
 }
-exports.UpdateAfiliadoAux = (req,callback) => {
+
+//metodo para actualizar datos personales de un afiliado 
+exports.UpdateDataAfiliado = (req,callback) => {
     let data = {
+        razonsocial: req.body.razonsocial,
+        nif: req.body.nif,
         domicilio : req.body.domicilio,
-        email: req.body.email,
-        telefono: req.body.telefono,
-        editado: req.body.editado
+        codigopostal: req.body.codigopostal,
+        poblacion: req.body.poblacion,
+        provincia: req.body.provincia,
+        telefono1: req.body.telefono1,
+        telefono2: req.body.telefono2,
+        email: req.body.email
     }  //el orden en el arr sera el orden en el q encajen en el set del update
-    let sql = "UPDATE afiliadoauxiliar SET ? WHERE Afiliados_idAfiliados = "+req.params.id;
-    conexion.query(sql,data,(error,resultado) => {
-        if(error) callback(error);
-        callback(resultado);
-    })
+    
+    let sql = "UPDATE afiliados SET ? WHERE idafiliado = "+req.params.id;
+
+    conexion.beginTransaction((err) => {
+        if(err) callback(err)
+            
+        conexion.query(sql,data,(error,resultado) => {
+            if(error) {
+                return conexion.rollback(() => {
+                    callback(error)
+                });
+            }
+
+            conexion.commit((err) => {
+                if (err) {
+                    return conexion.rollback(function() {
+                        callback(err)
+                    });
+                }
+
+                callback(resultado)
+            });
+        })
+    });
+
 }
+
+//metodo para actualizar datos personales de un Familiar de un Afiliado 
+exports.UpdateDataFamiliar = (req,callback) => {
+    let data = {
+        razonsocial: req.body.razonsocial,
+        nombre: req.body.nombre,
+        nif: req.body.nif,
+        parentesco : req.body.parentesco,
+        fechanacimiento: req.body.fechanacimiento
+    }  //el orden en el arr sera el orden en el q encajen en el set del update
+    
+    let sql = "UPDATE afiliadosdetalle SET ? WHERE idafiliadodetalle = "+req.params.idfamilia;
+
+    conexion.beginTransaction((err) => {
+        if(err) callback(err)
+            
+        conexion.query(sql,data,(error,resultado) => {
+            if(error) {
+                return conexion.rollback(() => {
+                    callback(error)
+                });
+            }
+
+            conexion.commit((err) => {
+                if (err) {
+                    return conexion.rollback(function() {
+                        callback(err)
+                    });
+                }
+                callback(resultado)
+            });
+        })
+    });
+
+}
+
 exports.UpdateAfiliado = (req,callback) => {
     let data = [
         req.body.password,
         req.params.id,
     ] //el orden en el arr sera el orden en el q encajen en el set del update
-    let sql = "UPDATE afiliados SET password = ? WHERE idAfiliados = ?";
+    let sql = "UPDATE afiliados SET password = ? WHERE idafiliado = ?";
     conexion.query(sql,data,(error,resultado) => {
         if(error) callback(error);
         callback(resultado);
     })
 }
 exports.ElimiarAfiliado = (req,callback) => {
-    conexion.query("DELETE FROM afiliados WHERE idAfiliados = ?",[req.params.id],(error,resultado) => {
+    conexion.query("DELETE FROM afiliados WHERE idafiliado = ?",[req.params.id],(error,resultado) => {
         if(error) callback(error);
         callback(resultado);
     })
@@ -97,7 +179,7 @@ exports.LoginAfiliado = (req,callback) => {
             callback(resultado);
         })
     } else { //vengo por un registro
-        conexion.query("SELECT idAfiliados FROM afiliados WHERE email = ? AND nombre = ?",[req.body.email,req.body.nombre],(error,resultado) => {
+        conexion.query("SELECT idafiliado FROM afiliados WHERE email = ? AND nombre = ?",[req.body.email,req.body.nombre],(error,resultado) => {
             if(error) callback(error);
             callback(resultado);
         })

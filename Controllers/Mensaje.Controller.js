@@ -53,8 +53,9 @@ exports.UpdateMensaje = (req,callback) => {
         req.body.idModificacion.split('Z')[0],
         req.params.id,
     ] //el orden en el arr sera el orden en el q encajen en el set del update
+
     let sql = "UPDATE mensajes SET FechaVisto = ?, idModificacion = ? WHERE idmensaje= ?";
-  //  console.log(data);
+     console.log(data);
     conexion.query(sql,data,(error,resultado) => {
         if(error) callback(error);
         callback(resultado);
