@@ -9,18 +9,18 @@ const mysql = require("mysql");
 })  */
 
 //CONEXION A localhost---falso servicio o DB produccion
-/* const conexion = mysql.createConnection({
-    host: 'localhost',
-    database:'falsoservicio',
-    user:'root',
-    password:'lhe2604'
-}) */
 const conexion = mysql.createConnection({
     host: 'localhost',
     database:'asprobank',
     user:'root',
-    password:''
+    password:'lhe2604'
 })
+/* const conexion = mysql.createConnection({
+    host: 'localhost',
+    database:'asprobank',
+    user:'root',
+    password:''
+}) */
 
 conexion.connect(
     (error) => {

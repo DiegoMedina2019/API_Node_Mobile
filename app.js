@@ -59,7 +59,9 @@ app.listen(puerto,() => {
 
 const afiliadoRouter = require("./Routers/Afiliado.Router")
 const mensajeRouter = require("./Routers/Mensaje.Router");
+const encuestaRouter = require('./Routers/Encuesta.Router');
 const { send } = require("process");
 
 app.use("/api/",afiliadoRouter)
 app.use("/api/",mensajeRouter)
+app.use("/api/",encuestaRouter)
