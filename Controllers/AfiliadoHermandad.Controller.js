@@ -1,4 +1,38 @@
 const conexion = require("../Data/ConexionHermandad");
+const reutilizadas = require("../Recursos/Funtions");
+
+const asyncQUERY = (data,sql,callbackAsyncQuery) => {
+    
+    conexion.beginTransaction((err) => {
+        if(err) callbackAsyncQuery(err);
+
+        conexion.query(sql,data,(error,resultado) => {
+            if(error) {
+                return conexion.rollback(() => {
+                    callbackAsyncQuery(error);
+                });
+            }
+            conexion.commit((err) => {
+                if (err) {
+                    return conexion.rollback(function() {
+                        callbackAsyncQuery(err);
+                    });
+                }
+                callbackAsyncQuery(resultado);
+            });
+        })
+    });
+    
+}
+const final = (argsResp,cb) => { 
+    //console.log('Done', argsResp.results);
+    let i = 0;
+    argsResp.results.forEach(elem => {
+        (elem.errno)? i-- : i++;
+    });
+    let mjs =  (i == argsResp.cant)? argsResp.mjs_success: argsResp.mjs_err;
+    cb({callMjs:mjs})
+}
 
 exports.GetAfiliados = (req,callback) => {
     conexion.query("SELECT * FROM afiliados", (error,filas) => {
@@ -14,8 +48,8 @@ exports.GetAfiliado = (req,callback) => {
         if(error){
             callback(error)
         }else{
-           // callback(fila);
-           callback(fila[0].email);
+            callback(fila);
+           //callback(fila[0].email);
         }
     })
 }
@@ -56,7 +90,7 @@ exports.AddAfiliado = (req,callback) => {
         email:req.body.email,
         direccion:req.body.direccion,
         telefono:req.body.telefono,
-        password:req.body.password
+        Pass:req.body.Pass
     }
     let sql = "INSERT INTO idafiliado SET ?";
     conexion.query(sql,data,(error,resultado) => {
@@ -81,85 +115,71 @@ exports.AddAfiliadoAux = (req,callback) => { //falso update
 
 //metodo para actualizar datos personales de un afiliado 
 exports.UpdateDataAfiliado = (req,callback) => {
+
+    //console.log(req.body);
     let data = {
-        razonsocial: req.body.razonsocial,
-        nif: req.body.nif,
-        domicilio : req.body.domicilio,
-        codigopostal: req.body.codigopostal,
-        poblacion: req.body.poblacion,
-        provincia: req.body.provincia,
-        telefono1: req.body.telefono1,
-        telefono2: req.body.telefono2,
-        email: req.body.email
+        razonsocial: req.body.afiliado.razonsocial,
+        nombre: req.body.afiliado.nombre,
+        nif: req.body.afiliado.nif,
+        domicilio : req.body.afiliado.domicilio,
+        codigopostal: req.body.afiliado.codigopostal,
+        poblacion: req.body.afiliado.poblacion,
+        provincia: req.body.afiliado.provincia,
+        telefono1: req.body.afiliado.telefono1,
+        telefono2: req.body.afiliado.telefono2,
+        email: req.body.afiliado.email
     }  //el orden en el arr sera el orden en el q encajen en el set del update
     
     let sql = "UPDATE afiliados SET ? WHERE idafiliado = "+req.params.id;
 
-    conexion.beginTransaction((err) => {
-        if(err) callback(err)
-            
-        conexion.query(sql,data,(error,resultado) => {
-            if(error) {
-                return conexion.rollback(() => {
-                    callback(error)
-                });
-            }
-
-            conexion.commit((err) => {
-                if (err) {
-                    return conexion.rollback(function() {
-                        callback(err)
-                    });
-                }
-
-                callback(resultado)
-            });
-        })
+    asyncQUERY( data, sql, (result) => {
+        let mjs_err="Hubo un inconveniente, por favor regrese y realice nuevamente la acción";
+        let mjs_success="Sus datos personales fueron actualizados con exito";
+        let mjs =  (result.errno)? mjs_err: mjs_success;
+        callback({callMjs:mjs})
     });
-
 }
 
 //metodo para actualizar datos personales de un Familiar de un Afiliado 
 exports.UpdateDataFamiliar = (req,callback) => {
-    let data = {
-        razonsocial: req.body.razonsocial,
-        nombre: req.body.nombre,
-        nif: req.body.nif,
-        parentesco : req.body.parentesco,
-        fechanacimiento: req.body.fechanacimiento
-    }  //el orden en el arr sera el orden en el q encajen en el set del update
-    
-    let sql = "UPDATE afiliadosdetalle SET ? WHERE idafiliadodetalle = "+req.params.idfamilia;
 
-    conexion.beginTransaction((err) => {
-        if(err) callback(err)
-            
-        conexion.query(sql,data,(error,resultado) => {
-            if(error) {
-                return conexion.rollback(() => {
-                    callback(error)
-                });
-            }
+    let familiares = req.body.familiares;
+    let cant = familiares.length;
+    var results = [];
 
-            conexion.commit((err) => {
-                if (err) {
-                    return conexion.rollback(function() {
-                        callback(err)
-                    });
-                }
-                callback(resultado)
+    const series = (item) => {
+        if(item) {           
+            let sql = "UPDATE afiliadosdetalle SET ? WHERE idafiliadodetalle = "+item.idafiliadodetalle;
+            let data = {
+                razonsocial: item.apellido,
+                nombre: item.nombre,
+                nif: item.nif,
+                parentesco : item.parentesco,
+                fechanacimiento: item.fechanacimiento
+            }  //el orden en el arr sera el orden en el q encajen en el set del update
+            asyncQUERY( data, sql, (result) => {
+                results.push(result);
+                return series(familiares.shift());
             });
-        })
-    });
-
+        } else {
+            let argsResp = {
+                results : results,
+                cant:cant,
+                mjs_err:"Hubo un inconveniente, por favor regrese y realice nuevamente la acción",
+                mjs_success:"Los Datos de su familia fueron actualizados con exito"
+            }
+            return final(argsResp,callback);
+        }
+    }
+    series(familiares.shift());
 }
 
 exports.UpdateAfiliado = (req,callback) => {
     let data = [
-        req.body.password,
+        req.body.Pass,
         req.params.id,
     ] //el orden en el arr sera el orden en el q encajen en el set del update
-    let sql = "UPDATE afiliados SET password = ? WHERE idafiliado = ?";
+    let sql = "UPDATE afiliados SET Pass = ? WHERE idafiliado = ?";
     conexion.query(sql,data,(error,resultado) => {
         if(error) callback(error);
         callback(resultado);
@@ -174,7 +194,7 @@ exports.ElimiarAfiliado = (req,callback) => {
 
 exports.LoginAfiliado = (req,callback) => {
     if ( typeof req.body.registro === 'undefined') { //vengo por un Logeo
-        conexion.query("SELECT * FROM afiliados WHERE email = ? AND password = ?",[req.body.email,req.body.password],(error,resultado) => {
+        conexion.query("SELECT * FROM afiliados WHERE email = ? AND Pass = ?",[req.body.email,req.body.Pass],(error,resultado) => {
             if(error) callback(error);
             callback(resultado);
         })

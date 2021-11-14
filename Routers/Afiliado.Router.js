@@ -30,6 +30,11 @@ afiliadoRouter.get("/afiliado/:id",(req,res) => {
         })
     }
 })
+afiliadoRouter.get("/afiliado_Hermandad/:id",(req,res) => {
+    controlHermandad.GetAfiliado( req ,(respuesta) => {
+        res.send(respuesta)
+    })
+})
 
 //TRAE LOS FAMILIARES DE UN AFILIADO
 afiliadoRouter.get("/familiares/:idafiliado",(req,res) => {
@@ -77,8 +82,8 @@ afiliadoRouter.put("/afiliado/:id",(req,res) => {
         })
     }
 })
-//EDITAR DATOS DE FAMILIAR DE UN AFILIADO
-afiliadoRouter.put("/afiliado/familia_Update/:idfamilia",(req,res) => {
+//EDITAR DATOS DE FAMILIARES DE UN AFILIADO
+afiliadoRouter.put("/afiliado_familia_Update",(req,res) => {
     controlHermandad.UpdateDataFamiliar( req ,(respuesta) => {
         res.send(respuesta)
     })
