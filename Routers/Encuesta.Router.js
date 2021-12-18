@@ -19,4 +19,17 @@ encuestaRouter.post("/encuestas/respondida",(req,res) => {
     })
 })
 
+encuestaRouter.get("/doc_encuestas/:idencuesta",(req,res)=> {
+    controladorEncuesta.GetDoc(req,(respuesta)=>{
+
+        if (respuesta.exite) {
+            res.redirect('/doc_encuesta.html?ruta='+respuesta.ruta)
+        } else {
+            res.redirect('/doc_encuesta_notExit.html')
+        }
+        
+        //res.send(respuesta)
+    })
+})
+
 module.exports = encuestaRouter;

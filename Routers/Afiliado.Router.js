@@ -179,4 +179,11 @@ afiliadoRouter.post("/sepa",upload.single('image'),(req,res) => {
     }
 })
 
+//Datos de un delegado para afiliado logeado 
+afiliadoRouter.get("/mi_delegado",(req,res) => {
+    controlador.GetDelegado(req,(respuesta) => {
+        res.send(respuesta)
+    })
+})
+
 module.exports = afiliadoRouter;

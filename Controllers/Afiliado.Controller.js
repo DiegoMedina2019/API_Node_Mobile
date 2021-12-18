@@ -66,3 +66,31 @@ exports.LoginAfiliado = (req,callback) => {
     }
 
 }
+
+exports.GetDelegado = (req,callback) => {
+    conexion.query("SELECT \
+                    CONCAT(a.nombre, ' ', a.razonsocial) AS delegado,\
+                    a.email AS emaildelegado,\
+                    z.nombre AS oficinadelegado,\
+                    z.domicilio ,\
+                    z.codigopostal ,\
+                    z.poblacion ,\
+                    z.provincia ,\
+                    z.telefono1 ,\
+                    z.telefono2 \
+                FROM\
+                    comites c\
+                        LEFT JOIN\
+                    afiliados a ON c.idResponsable = a.idafiliado\
+                        LEFT JOIN\
+                    zonas z ON a.idoficina = z.idzona\
+                WHERE\
+                    c.idcomite = 12",[], (error,fila) => {
+        if(error){
+            callback(error)
+        }else{
+           // callback(fila);
+           callback(fila[0]);
+        }
+    })
+}

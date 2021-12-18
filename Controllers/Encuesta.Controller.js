@@ -78,26 +78,60 @@ const final = (argsResp,cb) => {
     let mjs =  (i == argsResp.cant)? argsResp.mjs_success: argsResp.mjs_err;
     cb({callMjs:mjs})
 }
+const updateEncuestasAfiliados = (id,results,cant,callback) => { 
+    let sql = "UPDATE encuestas_has_afiliados SET `realizada` = '1' WHERE (`idencuestas_afiliados` = ? )";
+    asyncQUERY( [id], sql, (result) => {
+        results.push(result);
+        let argsResp = {
+            results : results,
+            cant:cant,
+            mjs_err:"Hubo un inconveniente, por favor regrese y realice nuevamente la acción",
+            mjs_success:"Su respuesta fue enviada con exito"
+        }
+        return final(argsResp,callback);
+    });
+}
 
 exports.SetRespuesta = (req, callback) =>{
     let respuestas = req.body.respuestas;
-    let cant = respuestas.length;
+    let cant = respuestas.length + 1;
     var results = [];
-    
+    const idafiliado = req.body.idafiliado;
+    const idencuestacabecera = req.body.idencuestacabecera;
+    let idencuestas_afiliados = 0;
+    conexion.query("SELECT * FROM encuestas_has_afiliados\
+                     where idafiliado = ? and idencuestacabecera = ?",[idafiliado,idencuestacabecera],(error,filas) =>{
+        if(error){
+            console.log(error)
+        }else{     
+            idencuestas_afiliados = filas[0].idencuestas_afiliados;
+        }
+    })
+
+    /* editar la tabla en el serve y el API con este nuevo campo de respuesta definitivo
+    ALTER TABLE `asprobank`.`encuesta_resultado`    
+    ADD COLUMN `respuesta_usuario` VARCHAR(200) NULL DEFAULT '' AFTER `idBorrado`;
+     */
+
     const series = (item) => {
 
-        let sql1 = "INSERT INTO encuesta_resultado \
+        /* let sql1 = "INSERT INTO encuesta_resultado \
                     (`idencuestadetalle`, `idafiliado`, `FechaHoraVotacion`, `ResultadoSN`, `idEmpresa`, `borrado`, `insertado`)\
                     VALUES (?, ?, now(), ?, '000', '0', '1')";
         let sql2 = "INSERT INTO encuesta_resultado \
                     (`idencuestadetalle`, `idafiliado`, `FechaHoraVotacion`, `ResultadoValor`, `idEmpresa`, `borrado`, `insertado`)\
-                     VALUES (?, ?, now(), ?, '000', '0', '1')";
+                     VALUES (?, ?, now(), ?, '000', '0', '1')"; */
+
+        let sql = "INSERT INTO encuesta_resultado\
+                (`idencuestadetalle`, `idafiliado`, `FechaHoraVotacion`, `idEmpresa`, `borrado`, `insertado`, `respuesta_usuario`)\
+                VALUES (?, ?, now(), '000', '0', '1', ?)";
+
         if(item) {
-            if(item.Resultado == 1){
+            /* if(item.Resultado == 1){
                 let data1 = [
                     item.idencuestadetalle,
-                    item.idafiliado,
-                    item.ResultadoSN
+                    idafiliado,
+                    item.respuesta_usuario
                 ]
                 asyncQUERY( data1, sql1, (result) => {
                     results.push(result);
@@ -106,34 +140,48 @@ exports.SetRespuesta = (req, callback) =>{
             }else{
                 let data2 = [
                     item.idencuestadetalle,
-                    item.idafiliado,
+                    idafiliado,
                     item.ResultadoValor
                 ]
                 asyncQUERY( data2, sql2, (result) => {
                     results.push(result);
                     return series(respuestas.shift());
                 });
-            }
-            
-            /* let sql = "UPDATE encuesta_detalle SET Resultado = ?, idModificacion = now() WHERE idencuestadetalle= ?";
+            } */
+        
             let data = [
-                item.Resultado,
-                item.idencuestadetalle
+                item.idencuestadetalle,
+                idafiliado,
+                item.respuesta_usuario
             ]
             asyncQUERY( data, sql, (result) => {
                 results.push(result);
                 return series(respuestas.shift());
-            }); */
+            });
         } else {
-            let argsResp = {
-                results : results,
-                cant:cant,
-                mjs_err:"Hubo un inconveniente, por favor regrese y realice nuevamente la acción",
-                mjs_success:"Su encuesta fue enviada con exito"
-            }
-            return final(argsResp,callback);
+           return updateEncuestasAfiliados(idencuestas_afiliados,results,cant,callback)
         }
     }
     series(respuestas.shift());
+}
+
+exports.GetDoc = (req,callback) => {
+    let url = {
+        exite:false,
+        ruta: ""
+    }
+    let sql = "SELECT * FROM encuesta_cabecera where idencuestacabecera = ?";
+    conexion.query(sql,[req.params.idencuesta],(err,filas)=>{
+        if (err) {
+            callback(err)
+        } else {
+            if (filas[0].FicheroPdf != "" ) {
+                url.ruta = filas[0].FicheroPdf;
+                url.exite = true;
+            }
+            callback(url)
+        }
+    })
+    // callback("public/documentos/doc_encuestas/doc_example.pdf")
 }
 
