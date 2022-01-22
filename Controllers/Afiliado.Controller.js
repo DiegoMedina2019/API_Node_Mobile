@@ -35,15 +35,32 @@ exports.AddAfiliado = (req,callback) => {
 }
 
 exports.UpdateAfiliado = (req,callback) => {
-    let data = [
-        req.body.password,
-        req.params.id,
-    ] //el orden en el arr sera el orden en el q encajen en el set del update
-    let sql = "UPDATE afiliados SET password = ? WHERE idafiliado = ?";
-    conexion.query(sql,data,(error,resultado) => {
-        if(error) callback(error);
-        callback(resultado);
-    })
+    let body = JSON.stringify(req.body);
+    if ( typeof req.body.isInit === 'undefined') { //vengo para edit solamente la pass
+        let data = [
+            req.body.password,
+            req.params.id,
+        ] //el orden en el arr sera el orden en el q encajen en el set del update
+        let sql = "UPDATE afiliados SET password = ? WHERE idafiliado = ?";
+        conexion.query(sql,data,(error,resultado) => {
+            if(error) callback(error);
+            callback(resultado);
+        })
+
+    } else { //vengo para editar la Pass y el campo login_init ya que es login por primera vez
+        
+        let data = [
+            req.body.password,
+            1,
+            req.params.id,
+        ] //el orden en el arr sera el orden en el q encajen en el set del update
+        let sql = "UPDATE afiliados SET password = ?, login_init = ? WHERE idafiliado = ?";
+        conexion.query(sql,data,(error,resultado) => {
+            if(error) callback(error);
+            callback(resultado);
+        })
+    }
+
 }
 exports.ElimiarAfiliado = (req,callback) => {
     conexion.query("DELETE FROM afiliados WHERE idafiliado = ?",[req.params.id],(error,resultado) => {
