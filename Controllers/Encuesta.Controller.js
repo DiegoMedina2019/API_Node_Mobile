@@ -2,7 +2,7 @@ const conexion = require("../Data/Conexion.Mysql");
 
 exports.AllEncuestas = (req,callback)=>{
 
-    conexion.query("SELECT encuesta_cabecera.idencuestacabecera,tipo,nombre,DesdeFecha,HastaFecha,idencuestas_afiliados\
+    conexion.query("SELECT encuesta_cabecera.idencuestacabecera,tipo,nombre,DesdeFecha,HastaFecha,idencuestas_afiliados,FicheroPdf\
                     FROM encuesta_cabecera \
                     JOIN\
                     encuestas_has_afiliados ON encuesta_cabecera.idencuestacabecera = encuestas_has_afiliados.idencuestacabecera\
