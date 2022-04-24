@@ -60,8 +60,12 @@ app.listen(puerto,() => {
 const afiliadoRouter = require("./Routers/Afiliado.Router")
 const mensajeRouter = require("./Routers/Mensaje.Router");
 const encuestaRouter = require('./Routers/Encuesta.Router');
+const circularesRouter = require('./Routers/Circulares.Router');
+const FAQRouter = require('./Routers/FAQ.Router');
 const { send } = require("process");
 
 app.use("/api/",afiliadoRouter)
 app.use("/api/",mensajeRouter)
 app.use("/api/",encuestaRouter)
+app.use("/api/",circularesRouter)
+app.use("/api/",FAQRouter)
