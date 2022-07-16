@@ -9,4 +9,10 @@ circularesRouter.get("/circulares", (req,res) => {
     res.redirect('/descargas_circulares.html')
 })
 
+circularesRouter.get("/circulares/hermandad", (req,res) => {
+    //let ruta = "public/documentos/sirculares/"+req.params.url;
+    //res.redirect('/descargas_sirculares.html?ruta='+ruta)
+    res.redirect('/descargas_circulares_hermandad.html')
+})
+
 module.exports = circularesRouter;
